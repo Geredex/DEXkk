@@ -52,7 +52,7 @@ export function getMatchStatusText(status: string): { text: string; icon: string
 }
 
 export function canStartMatch(match: Match): boolean {
-  return match.status === "pending" && match.player1Id && match.player2Id;
+  return match.status === "pending" && !!match.player1Id && !!match.player2Id;
 }
 
 export function getNextMatch(matches: Match[]): Match | null {

@@ -131,6 +131,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!match) {
         return res.status(404).json({ message: "Match not found" });
       }
+
+      // Advance winner to next round if not final round
+      const tournament = await storage.getTournament(match.tournamentId);
+      if (tournament && match.round < tournament.totalRounds) {
+        const allMatches = await storage.getMatchesByTournament(match.tournamentId);
+        const nextRoundMatches = allMatches.filter(m => m.round === match.round + 1);
+        
+        // Find the corresponding match in the next round
+        const nextMatchPosition = Math.ceil(match.position / 2);
+        const nextMatch = nextRoundMatches.find(m => m.position === nextMatchPosition);
+        
+        if (nextMatch) {
+          // Determine if winner goes to player1 or player2 slot
+          const isPlayer1Slot = (match.position % 2 === 1);
+          
+          if (isPlayer1Slot && !nextMatch.player1Id) {
+            await storage.updateMatch(nextMatch.id, { player1Id: resultData.winnerId });
+          } else if (!isPlayer1Slot && !nextMatch.player2Id) {
+            await storage.updateMatch(nextMatch.id, { player2Id: resultData.winnerId });
+          }
+        }
+      }
+
       res.json(match);
     } catch (error: any) {
       res.status(400).json({ message: error.message });

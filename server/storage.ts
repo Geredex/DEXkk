@@ -21,6 +21,7 @@ export interface IStorage {
   updateMatchScore(id: string, scores: UpdateMatchScore): Promise<Match | undefined>;
   completeMatch(id: string, result: CompleteMatch): Promise<Match | undefined>;
   updateMatchStatus(id: string, status: string): Promise<Match | undefined>;
+  updateMatch(id: string, updates: Partial<Match>): Promise<Match | undefined>;
   getMatch(id: string): Promise<Match | undefined>;
 }
 
@@ -38,13 +39,15 @@ export class MemStorage implements IStorage {
   // Tournament methods
   async createTournament(insertTournament: InsertTournament): Promise<Tournament> {
     const id = randomUUID();
-    const totalRounds = insertTournament.size === 16 ? 4 : 5;
+    const defaultRounds = insertTournament.size === 16 ? 4 : 5;
+    const totalRounds = insertTournament.totalRounds || defaultRounds;
     const tournament: Tournament = {
-      ...insertTournament,
       id,
-      totalRounds,
-      currentRound: 1,
+      name: insertTournament.name,
+      size: insertTournament.size,
       status: "setup",
+      currentRound: 1,
+      totalRounds,
       createdAt: new Date(),
     };
     this.tournaments.set(id, tournament);
@@ -106,8 +109,12 @@ export class MemStorage implements IStorage {
   async createMatch(insertMatch: InsertMatch): Promise<Match> {
     const id = randomUUID();
     const match: Match = {
-      ...insertMatch,
       id,
+      tournamentId: insertMatch.tournamentId,
+      round: insertMatch.round,
+      position: insertMatch.position,
+      player1Id: insertMatch.player1Id || null,
+      player2Id: insertMatch.player2Id || null,
       player1Score: 0,
       player2Score: 0,
       status: "pending",
@@ -172,6 +179,15 @@ export class MemStorage implements IStorage {
       status,
       ...(status === "in_progress" && match.startTime === null && { startTime: new Date() })
     };
+    this.matches.set(id, updated);
+    return updated;
+  }
+
+  async updateMatch(id: string, updates: Partial<Match>): Promise<Match | undefined> {
+    const match = this.matches.get(id);
+    if (!match) return undefined;
+    
+    const updated = { ...match, ...updates };
     this.matches.set(id, updated);
     return updated;
   }

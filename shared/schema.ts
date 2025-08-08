@@ -38,9 +38,9 @@ export const matches = pgTable("matches", {
 export const insertTournamentSchema = createInsertSchema(tournaments).omit({
   id: true,
   createdAt: true,
-  totalRounds: true,
 }).extend({
   size: z.number().min(16).max(32),
+  totalRounds: z.number().min(1).max(10).optional(),
 });
 
 export const insertPlayerSchema = createInsertSchema(players).omit({

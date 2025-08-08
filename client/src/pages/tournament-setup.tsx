@@ -15,8 +15,11 @@ export default function TournamentSetup() {
   
   const [tournamentName, setTournamentName] = useState("");
   const [tournamentSize, setTournamentSize] = useState<16 | 32>(16);
+  const [customRounds, setCustomRounds] = useState<number | null>(null);
   const [newPlayerName, setNewPlayerName] = useState("");
-  const [currentTournamentId, setCurrentTournamentId] = useState<string | null>(null);
+  const [currentTournamentId, setCurrentTournamentId] = useState<string | null>(
+    localStorage.getItem("currentTournamentId")
+  );
 
   // Get current tournament and players
   const { data: players = [] } = useQuery<Player[]>({
@@ -25,12 +28,13 @@ export default function TournamentSetup() {
   });
 
   const createTournamentMutation = useMutation({
-    mutationFn: async (data: { name: string; size: number }) => {
+    mutationFn: async (data: { name: string; size: number; totalRounds?: number }) => {
       const response = await apiRequest("POST", "/api/tournaments", data);
       return response.json();
     },
     onSuccess: (tournament: Tournament) => {
       setCurrentTournamentId(tournament.id);
+      localStorage.setItem("currentTournamentId", tournament.id);
       queryClient.invalidateQueries({ queryKey: ["/api/tournaments"] });
       toast({
         title: "Tournament Created",
@@ -123,7 +127,14 @@ export default function TournamentSetup() {
       });
       return;
     }
-    createTournamentMutation.mutate({ name: tournamentName, size: tournamentSize });
+    const data: { name: string; size: number; totalRounds?: number } = { 
+      name: tournamentName, 
+      size: tournamentSize 
+    };
+    if (customRounds !== null) {
+      data.totalRounds = customRounds;
+    }
+    createTournamentMutation.mutate(data);
   };
 
   const handleAddPlayer = () => {
@@ -187,12 +198,15 @@ export default function TournamentSetup() {
                     ? "bg-tournament-50 border-tournament-200 text-tournament-600 hover:bg-tournament-100"
                     : "border-gray-200 hover:border-tournament-500"
                 }`}
-                onClick={() => setTournamentSize(16)}
+                onClick={() => {
+                  setTournamentSize(16);
+                  setCustomRounds(null);
+                }}
                 disabled={!!currentTournamentId}
               >
                 <div className="text-2xl font-bold mb-2">16</div>
                 <div className="text-sm">Players</div>
-                <div className="text-xs mt-2 opacity-75">4 Rounds</div>
+                <div className="text-xs mt-2 opacity-75">Default: 4 Rounds</div>
               </Button>
               <Button
                 data-testid="tournament-size-32"
@@ -202,14 +216,60 @@ export default function TournamentSetup() {
                     ? "bg-tournament-50 border-tournament-200 text-tournament-600 hover:bg-tournament-100"
                     : "border-gray-200 hover:border-tournament-500"
                 }`}
-                onClick={() => setTournamentSize(32)}
+                onClick={() => {
+                  setTournamentSize(32);
+                  setCustomRounds(null);
+                }}
                 disabled={!!currentTournamentId}
               >
                 <div className="text-2xl font-bold mb-2">32</div>
                 <div className="text-sm">Players</div>
-                <div className="text-xs mt-2 opacity-75">5 Rounds</div>
+                <div className="text-xs mt-2 opacity-75">Default: 5 Rounds</div>
               </Button>
             </div>
+          </div>
+
+          {/* Custom Rounds Selection */}
+          <div className="mb-8">
+            <label className="block text-lg font-semibold text-gray-700 mb-4">Number of Rounds</label>
+            <p className="text-sm text-gray-600 mb-4">
+              Choose how many rounds you want in your tournament (default is {tournamentSize === 16 ? '4' : '5'} rounds)
+            </p>
+            <div className="grid grid-cols-5 gap-3">
+              {Array.from({ length: 10 }, (_, i) => i + 1).map((rounds) => (
+                <Button
+                  key={rounds}
+                  data-testid={`rounds-${rounds}`}
+                  variant={customRounds === rounds ? "default" : "outline"}
+                  className={`h-12 ${
+                    customRounds === rounds
+                      ? "bg-tournament-500 text-white hover:bg-tournament-600"
+                      : "border-gray-200 hover:border-tournament-500"
+                  }`}
+                  onClick={() => setCustomRounds(rounds)}
+                  disabled={!!currentTournamentId}
+                >
+                  {rounds}
+                </Button>
+              ))}
+            </div>
+            {customRounds && (
+              <div className="mt-3 flex items-center justify-between">
+                <p className="text-sm text-tournament-600">
+                  Selected: {customRounds} rounds
+                </p>
+                <Button
+                  data-testid="button-reset-rounds"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setCustomRounds(null)}
+                  disabled={!!currentTournamentId}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  Use Default
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Tournament Name */}
