@@ -285,6 +285,53 @@ export default function MatchTimer() {
     currentData.player2Score = (currentData.player2Ippon * 3) + (currentData.player2Wazari * 2) + currentData.player2Yuko;
     
     updateScoreMutation.mutate(currentData);
+
+    // Check for elimination due to 5 warnings
+    if (currentData.player1Warnings >= 5) {
+      setTimeout(() => {
+        toast({
+          title: "Player Eliminated!",
+          description: `${player1?.name || "Player 1"} has been eliminated due to 5 warnings.`,
+          variant: "destructive",
+        });
+        // Auto-complete match with player 2 as winner
+        completeMatchMutation.mutate({
+          winnerId: match.player2Id!,
+          player1Score: currentData.player1Score,
+          player2Score: currentData.player2Score,
+          player1Ippon: currentData.player1Ippon,
+          player1Wazari: currentData.player1Wazari,
+          player1Yuko: currentData.player1Yuko,
+          player1Warnings: currentData.player1Warnings,
+          player2Ippon: currentData.player2Ippon,
+          player2Wazari: currentData.player2Wazari,
+          player2Yuko: currentData.player2Yuko,
+          player2Warnings: currentData.player2Warnings,
+        });
+      }, 1000);
+    } else if (currentData.player2Warnings >= 5) {
+      setTimeout(() => {
+        toast({
+          title: "Player Eliminated!",
+          description: `${player2?.name || "Player 2"} has been eliminated due to 5 warnings.`,
+          variant: "destructive",
+        });
+        // Auto-complete match with player 1 as winner
+        completeMatchMutation.mutate({
+          winnerId: match.player1Id!,
+          player1Score: currentData.player1Score,
+          player2Score: currentData.player2Score,
+          player1Ippon: currentData.player1Ippon,
+          player1Wazari: currentData.player1Wazari,
+          player1Yuko: currentData.player1Yuko,
+          player1Warnings: currentData.player1Warnings,
+          player2Ippon: currentData.player2Ippon,
+          player2Wazari: currentData.player2Wazari,
+          player2Yuko: currentData.player2Yuko,
+          player2Warnings: currentData.player2Warnings,
+        });
+      }, 1000);
+    }
   };
 
   const handleEndMatch = () => {
@@ -370,15 +417,26 @@ export default function MatchTimer() {
               </div>
             </div>
 
-            {/* Sound Alerts Info */}
-            <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
-              <h4 className="text-sm font-semibold text-blue-800 mb-2 flex items-center">
-                <i className="fas fa-volume-up mr-2"></i>Sound Alerts
-              </h4>
-              <div className="text-xs text-blue-700 space-y-1">
-                <div>🔔 Start: Single beep when timer starts</div>
-                <div>⚠️ Warnings: Triple beep at 30s, 10s, 5s remaining</div>
-                <div>🔚 End: Five beeps when time is up</div>
+            {/* Sound Alerts & Rules Info */}
+            <div className="mb-6 space-y-3">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+                <h4 className="text-sm font-semibold text-blue-800 mb-2 flex items-center">
+                  <i className="fas fa-volume-up mr-2"></i>Sound Alerts
+                </h4>
+                <div className="text-xs text-blue-700 space-y-1">
+                  <div>🔔 Start: Single beep when timer starts</div>
+                  <div>⚠️ Warnings: Triple beep at 30s, 10s, 5s remaining</div>
+                  <div>🔚 End: Five beeps when time is up</div>
+                </div>
+              </div>
+              
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md mx-auto">
+                <h4 className="text-sm font-semibold text-red-800 mb-2 flex items-center">
+                  <i className="fas fa-exclamation-triangle mr-2"></i>Elimination Rule
+                </h4>
+                <div className="text-xs text-red-700">
+                  ⚠️ Player is automatically eliminated at 5 warnings
+                </div>
               </div>
             </div>
 
@@ -530,9 +588,18 @@ export default function MatchTimer() {
                 <div className="flex items-center justify-between bg-white rounded-lg p-3">
                   <div className="flex items-center space-x-2">
                     <span className="font-semibold">Warnings:</span>
-                    <span data-testid="text-player1-warnings" className="bg-red-100 text-red-800 px-2 py-1 rounded font-bold">
-                      {match.player1Warnings || 0}
+                    <span data-testid="text-player1-warnings" className={`px-2 py-1 rounded font-bold ${
+                      (match.player1Warnings || 0) >= 4 
+                        ? "bg-red-200 text-red-900 border border-red-300" 
+                        : "bg-red-100 text-red-800"
+                    }`}>
+                      {match.player1Warnings || 0}/5
                     </span>
+                    {(match.player1Warnings || 0) >= 4 && (
+                      <span className="text-xs text-red-600 font-semibold">
+                        ⚠️ DANGER
+                      </span>
+                    )}
                   </div>
                   <div className="flex space-x-2">
                     <Button
@@ -673,9 +740,18 @@ export default function MatchTimer() {
                 <div className="flex items-center justify-between bg-white rounded-lg p-3">
                   <div className="flex items-center space-x-2">
                     <span className="font-semibold">Warnings:</span>
-                    <span data-testid="text-player2-warnings" className="bg-red-100 text-red-800 px-2 py-1 rounded font-bold">
-                      {match.player2Warnings || 0}
+                    <span data-testid="text-player2-warnings" className={`px-2 py-1 rounded font-bold ${
+                      (match.player2Warnings || 0) >= 4 
+                        ? "bg-red-200 text-red-900 border border-red-300" 
+                        : "bg-red-100 text-red-800"
+                    }`}>
+                      {match.player2Warnings || 0}/5
                     </span>
+                    {(match.player2Warnings || 0) >= 4 && (
+                      <span className="text-xs text-red-600 font-semibold">
+                        ⚠️ DANGER
+                      </span>
+                    )}
                   </div>
                   <div className="flex space-x-2">
                     <Button
