@@ -233,9 +233,10 @@ export default function TournamentSetup() {
                   placeholder="Enter number of players..."
                   value={customPlayerCount}
                   onChange={(e) => {
-                    setCustomPlayerCount(e.target.value);
-                    const count = parseInt(e.target.value);
-                    if (count >= 2 && count <= 128) {
+                    const value = e.target.value;
+                    setCustomPlayerCount(value);
+                    const count = parseInt(value);
+                    if (!isNaN(count) && count >= 2 && count <= 128) {
                       setTournamentSize(count);
                       setCustomRounds(null);
                     }
@@ -261,8 +262,8 @@ export default function TournamentSetup() {
               </div>
               {customPlayerCount && (
                 <p className="text-sm text-gray-600 mt-2">
-                  {parseInt(customPlayerCount) > 0 && parseInt(customPlayerCount) <= 128 
-                    ? `${Math.ceil(Math.log2(parseInt(customPlayerCount)))} rounds needed`
+                  {parseInt(customPlayerCount) >= 2 && parseInt(customPlayerCount) <= 128 
+                    ? `${Math.ceil(Math.log2(parseInt(customPlayerCount)))} rounds needed for ${customPlayerCount} players`
                     : "Enter a number between 2 and 128"}
                 </p>
               )}
@@ -273,7 +274,7 @@ export default function TournamentSetup() {
           <div className="mb-8">
             <label className="block text-lg font-semibold text-gray-700 mb-4">Number of Rounds</label>
             <p className="text-sm text-gray-600 mb-4">
-              Choose how many rounds you want in your tournament (default is {tournamentSize === 16 ? '4' : '5'} rounds)
+              Choose how many rounds you want in your tournament (default is {Math.ceil(Math.log2(tournamentSize))} rounds for {tournamentSize} players)
             </p>
             <div className="grid grid-cols-5 gap-3">
               {Array.from({ length: 20 }, (_, i) => i + 1).map((rounds) => (
