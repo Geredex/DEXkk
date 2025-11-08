@@ -2,7 +2,23 @@
 
 ## Overview
 
-DEX is a comprehensive tournament management application specifically designed for Shito Ryu Karate kumite tournaments. The system enables tournament organizers to create and manage knockout-style tournaments with 2-128 participants, featuring authentic karate scoring (ippon, wazari, yuko), warning system with automatic elimination at 5 warnings, customizable rounds (1-20), timer presets with sound alerts, and belt color identification (red/blue). The application provides a streamlined interface for tournament setup with flexible player counts, player registration with automatic belt color assignment, bracket visualization, and real-time match management with professional karate scoring and elimination rules.
+DEX is a comprehensive tournament management application specifically designed for Shito Ryu Karate competitions, supporting both kumite (sparring) and kata (forms) tournaments. The system enables tournament organizers to create and manage knockout-style tournaments with 2-128 participants.
+
+**Kumite (Sparring) Features:**
+- Authentic karate scoring: ippon, wazari, yuko with point values
+- Warning system with automatic elimination at 5 warnings
+- Senshu (first point advantage) for tie-breaking with mutual exclusion logic
+- Customizable rounds (1-20) with timer presets and sound alerts
+- Belt color identification (red/blue) for each match
+- Decrement buttons for score adjustments
+
+**Kata (Forms) Features:**
+- 5-judge scoring system following standard kata rules
+- Automatic score calculation (drops highest and lowest, sums middle three)
+- Visual score breakdown showing which scores are dropped
+- Clear winner determination based on final scores
+
+The application provides a streamlined interface for tournament setup with flexible player counts, type selection (kumite/kata), player registration with automatic belt color assignment, bracket visualization, and real-time match management with professional karate scoring and elimination rules.
 
 ## User Preferences
 
