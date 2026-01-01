@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Tournament, Player } from "@shared/schema";
+import logoPngPath from "@assets/IJSKA_LOGO_WHITE_1767275682681.png";
 
 export default function TournamentSetup() {
   const [, setLocation] = useLocation();
@@ -182,6 +183,13 @@ export default function TournamentSetup() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 pb-20 sm:pb-6">
+      <div className="flex justify-center mb-8">
+        <img 
+          src={logoPngPath} 
+          alt="IJSKA Logo" 
+          className="h-32 w-auto object-contain"
+        />
+      </div>
       <Card className="shadow-lg">
         <CardContent className="p-8">
           <div className="text-center mb-8">
