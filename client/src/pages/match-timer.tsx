@@ -433,9 +433,14 @@ export default function MatchTimer() {
           {/* Score & Timer Header */}
           <div className="flex justify-between items-center mb-8 gap-4">
             {/* Player 1 Score Display */}
-            <div className={`flex-1 rounded-xl p-4 text-center ${
+            <div className={`flex-1 rounded-xl p-4 text-center relative ${
               player1?.beltColor === "red" ? "bg-red-600 text-white" : "bg-blue-600 text-white"
             }`}>
+              {match.player1Senshu && (
+                <div data-testid="badge-player1-senshu" className="absolute top-2 left-2 bg-yellow-400 text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm animate-pulse">
+                  SENSHU
+                </div>
+              )}
               <div className="text-sm font-medium opacity-90 uppercase tracking-wider">{player1?.name || "Player 1"}</div>
               <div data-testid="text-player1-score-large" className="text-6xl font-black">
                 {match.player1Score || 0}
@@ -483,9 +488,14 @@ export default function MatchTimer() {
             </div>
 
             {/* Player 2 Score Display */}
-            <div className={`flex-1 rounded-xl p-4 text-center ${
+            <div className={`flex-1 rounded-xl p-4 text-center relative ${
               player2?.beltColor === "red" ? "bg-red-600 text-white" : "bg-blue-600 text-white"
             }`}>
+              {match.player2Senshu && (
+                <div data-testid="badge-player2-senshu" className="absolute top-2 right-2 bg-yellow-400 text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm animate-pulse">
+                  SENSHU
+                </div>
+              )}
               <div className="text-sm font-medium opacity-90 uppercase tracking-wider">{player2?.name || "Player 2"}</div>
               <div data-testid="text-player2-score-large" className="text-6xl font-black">
                 {match.player2Score || 0}
