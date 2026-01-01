@@ -430,110 +430,69 @@ export default function MatchTimer() {
     <div className="max-w-4xl mx-auto p-6 pb-20 sm:pb-6">
       <Card className="shadow-lg">
         <CardContent className="p-8">
-          {/* Current Match Header */}
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Match Timer</h2>
-            <div className="bg-tournament-50 rounded-lg p-4">
-              <div className="text-lg font-semibold text-tournament-700 mb-1">Current Match</div>
-              <div className="text-2xl font-bold text-gray-900">
-                <span data-testid="text-current-player1">{player1?.name || "Player 1"}</span>
-                <span className="text-tournament-500 mx-4">VS</span>
-                <span data-testid="text-current-player2">{player2?.name || "Player 2"}</span>
+          {/* Score & Timer Header */}
+          <div className="flex justify-between items-center mb-8 gap-4">
+            {/* Player 1 Score Display */}
+            <div className={`flex-1 rounded-xl p-4 text-center ${
+              player1?.beltColor === "red" ? "bg-red-600 text-white" : "bg-blue-600 text-white"
+            }`}>
+              <div className="text-sm font-medium opacity-90 uppercase tracking-wider">{player1?.name || "Player 1"}</div>
+              <div data-testid="text-player1-score-large" className="text-6xl font-black">
+                {match.player1Score || 0}
+              </div>
+            </div>
+
+            {/* Timer Center Piece */}
+            <div className="flex-[1.5] text-center">
+              <div className="bg-gray-900 rounded-2xl p-6 shadow-xl mb-4 border-2 border-gray-800">
+                <div
+                  data-testid="text-timer-display"
+                  className="text-7xl font-bold text-white font-mono tracking-tighter"
+                >
+                  {formatTime(timerSeconds)}
+                </div>
+              </div>
+              <div className="flex justify-center space-x-2">
+                <Button
+                  data-testid="button-start-timer"
+                  onClick={handleStartTimer}
+                  disabled={isTimerRunning || timerSeconds === 0}
+                  className="bg-green-600 hover:bg-green-700 text-white shadow-md"
+                  size="sm"
+                >
+                  <i className="fas fa-play mr-2"></i>Start
+                </Button>
+                <Button
+                  data-testid="button-pause-timer"
+                  onClick={handlePauseTimer}
+                  disabled={!isTimerRunning}
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white shadow-md"
+                  size="sm"
+                >
+                  <i className="fas fa-pause mr-2"></i>Pause
+                </Button>
+                <Button
+                  data-testid="button-reset-timer"
+                  onClick={handleResetTimer}
+                  className="bg-red-600 hover:bg-red-700 text-white shadow-md"
+                  size="sm"
+                >
+                  <i className="fas fa-redo mr-2"></i>Reset
+                </Button>
+              </div>
+            </div>
+
+            {/* Player 2 Score Display */}
+            <div className={`flex-1 rounded-xl p-4 text-center ${
+              player2?.beltColor === "red" ? "bg-red-600 text-white" : "bg-blue-600 text-white"
+            }`}>
+              <div className="text-sm font-medium opacity-90 uppercase tracking-wider">{player2?.name || "Player 2"}</div>
+              <div data-testid="text-player2-score-large" className="text-6xl font-black">
+                {match.player2Score || 0}
               </div>
             </div>
           </div>
 
-          {/* Timer Display */}
-          <div className="text-center mb-8">
-            <div className="bg-gray-900 rounded-2xl p-8 mb-6">
-              <div
-                data-testid="text-timer-display"
-                className="text-8xl font-bold text-white font-mono"
-              >
-                {formatTime(timerSeconds)}
-              </div>
-              <div className="text-gray-400 text-lg mt-2">Match Time</div>
-            </div>
-
-            {/* Timer Presets */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-700 mb-3 text-center">Timer Presets</h3>
-              <div className="grid grid-cols-3 gap-3 max-w-md mx-auto">
-                {timerPresets.map((preset) => (
-                  <Button
-                    key={preset.value}
-                    data-testid={`button-preset-${preset.value}`}
-                    onClick={() => handlePresetChange(preset.value)}
-                    disabled={isTimerRunning}
-                    variant={selectedPreset === preset.value ? "default" : "outline"}
-                    className={`text-sm ${
-                      selectedPreset === preset.value 
-                        ? "bg-tournament-500 hover:bg-tournament-600 text-white" 
-                        : "hover:bg-gray-100"
-                    }`}
-                    size="sm"
-                  >
-                    {preset.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            {/* Sound Alerts & Rules Info */}
-            <div className="mb-6 space-y-3">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
-                <h4 className="text-sm font-semibold text-blue-800 mb-2 flex items-center">
-                  <i className="fas fa-volume-up mr-2"></i>Sound Alerts
-                </h4>
-                <div className="text-xs text-blue-700 space-y-1">
-                  <div>🔔 Start: Single beep when timer starts</div>
-                  <div>⚠️ Warnings: Triple beep at 30s, 10s, 5s remaining</div>
-                  <div>🔚 End: Five beeps when time is up</div>
-                </div>
-              </div>
-              
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md mx-auto">
-                <h4 className="text-sm font-semibold text-red-800 mb-2 flex items-center">
-                  <i className="fas fa-exclamation-triangle mr-2"></i>Elimination Rule
-                </h4>
-                <div className="text-xs text-red-700">
-                  ⚠️ Player is automatically eliminated at 5 warnings
-                </div>
-              </div>
-            </div>
-
-            {/* Timer Controls */}
-            <div className="flex justify-center space-x-4 mb-8">
-              <Button
-                data-testid="button-start-timer"
-                onClick={handleStartTimer}
-                disabled={isTimerRunning || timerSeconds === 0}
-                className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-xl font-semibold shadow-lg"
-                size="lg"
-              >
-                <i className="fas fa-play mr-3"></i>Start
-              </Button>
-              <Button
-                data-testid="button-pause-timer"
-                onClick={handlePauseTimer}
-                disabled={!isTimerRunning}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-4 text-xl font-semibold shadow-lg"
-                size="lg"
-              >
-                <i className="fas fa-pause mr-3"></i>Pause
-              </Button>
-              <Button
-                data-testid="button-reset-timer"
-                onClick={handleResetTimer}
-                className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 text-xl font-semibold shadow-lg"
-                size="lg"
-              >
-                <i className="fas fa-redo mr-3"></i>Reset
-              </Button>
-            </div>
-          </div>
-
-          {/* Karate Scoring System */}
           <div className="grid grid-cols-2 gap-8 mb-8">
             {/* Player 1 Scoring */}
             <div className={`score-section rounded-xl p-6 ${
