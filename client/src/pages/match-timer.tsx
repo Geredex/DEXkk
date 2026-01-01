@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Match, Player } from "@shared/schema";
@@ -902,13 +903,13 @@ export default function MatchTimer() {
                       min="0"
                       max="59"
                       className="h-10 w-16 text-center font-bold text-lg"
-                      onChange={(e) => {
-                        const mins = parseInt(e.target.value) || 0;
-                        const secs = timerSeconds % 60;
-                        const total = (mins * 60) + secs;
-                        setTimerSeconds(total);
-                        setSelectedPreset(total);
-                      }}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const mins = parseInt(e.target.value) || 0;
+                      const secs = timerSeconds % 60;
+                      const total = (mins * 60) + secs;
+                      setTimerSeconds(total);
+                      setSelectedPreset(total);
+                    }}
                       value={Math.floor(timerSeconds / 60)}
                     />
                   </div>
@@ -920,13 +921,13 @@ export default function MatchTimer() {
                       min="0"
                       max="59"
                       className="h-10 w-16 text-center font-bold text-lg"
-                      onChange={(e) => {
-                        const mins = Math.floor(timerSeconds / 60);
-                        const secs = parseInt(e.target.value) || 0;
-                        const total = (mins * 60) + (secs % 60);
-                        setTimerSeconds(total);
-                        setSelectedPreset(total);
-                      }}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const mins = Math.floor(timerSeconds / 60);
+                      const secs = parseInt(e.target.value) || 0;
+                      const total = (mins * 60) + (secs % 60);
+                      setTimerSeconds(total);
+                      setSelectedPreset(total);
+                    }}
                       value={timerSeconds % 60}
                     />
                   </div>
